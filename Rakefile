@@ -17,10 +17,17 @@ Jeweler::Tasks.new do |gem|
   gem.name = "gitosis_easy_conf"
   gem.homepage = "http://github.com/gorenje/gitosis_easy_conf"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Make writing a gitosis configuration easier}
+  gem.description = %Q{Easy gitosis configuration}
   gem.email = "gerrit.riessen@gmail.com"
   gem.authors = ["Gerrit Riessen"]
+
+  gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
+  gem.add_development_dependency "rake", ">= 0"
+  gem.add_development_dependency "jeweler", ">= 0"
+  gem.add_development_dependency "inifile", ">= 0"
+
+  gem.add_runtime_dependency "inifile", ">= 0"
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
@@ -42,7 +49,7 @@ end
 
 task :default => :test
 
-require 'rake/rdoctask'
+require 'rdoc/task'
 Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
