@@ -8,7 +8,14 @@ module Gitosis
 
     def method_missing(method, *args, &block)
       if args.length > 0 || block_given?
-        (@configs ||= {})[method.to_sym] = [args, block]
+        (@configs ||= {})[method.to_sym] = case method
+                                           when :fork_naming_convention then
+                                             block
+                                           when :filename then
+                                             args.first
+                                           else
+                                             [args, block]
+                                           end
       else
         @configs[method]
       end

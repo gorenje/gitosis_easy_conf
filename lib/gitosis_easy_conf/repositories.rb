@@ -5,32 +5,55 @@ module Gitosis
 
   class Repository
     def initialize(&block)
-      @conffile = IniFile.new("tmp.conf")
+      @conffile = IniFile.new(Gitosis.config.filename)
+      @origconffile = @conffile.clone
+
+      @fork_name = Gitosis.config.fork_naming_convention || lambda do |repo,forker|
+        "#{forker}_#{repo}"
+      end
+
       instance_eval(&block)
     end
 
     def write
-      @conffile.write
+      if @conffile.eql?(@origconffile)
+        puts "No changes, no update of #{Gitosis.config.filename}"
+      else
+        puts "Updating #{Gitosis.config.filename}"
+        @conffile.write
+      end
     end
 
     def method_missing(method, *args, &block)
-      puts "A.first: [#{method}] #{args.first}"
       committers = [args.first[:writable]].flatten.compact.collect do |member|
         Gitosis.groups[member]
       end.flatten
 
-      @conffile["group #{method}.write"]['writable'] = method
-      @conffile["group #{method}.write"]['members'] = committers.join(' ')
+      @conffile["group #{method}.writable"] = {
+        'members' => committers.join(' '),
+        'writable' => method
+      }
 
       readers = [args.first[:readable]].flatten.compact.collect do |member|
         Gitosis.groups[member]
       end.flatten
 
-      @conffile["group #{method}.readonly"]['readonly'] = method
-      @conffile["group #{method}.readonly"]['members'] = readers.join(' ')
+      @conffile["group #{method}.readonly"] = {
+        'members' => readers.join(' '),
+        'readonly' => method
+      } unless readers.empty?
 
-      puts "Repo: #{method}, has committers: #{committers.join(',')}"
-      puts "Repo: #{method}, has readers: #{readers.join(',')}"
+      [args.first[:forks]].flatten.compact.
+        collect { |a| a == :all ? Gitosis.forkers.all : a }.flatten.compact.each do |forker|
+        @conffile["group fork.#{method}.#{forker}.writable"] = {
+          'members' => ::Forker[forker],
+          'writable' => @fork_name.call(method,forker)
+        }
+        @conffile["group fork.#{method}.#{forker}.readonly"] = {
+          'members' => readers.join(' '),
+          'readonly' => @fork_name.call(method,forker)
+        }
+      end
     end
   end
 

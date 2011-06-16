@@ -13,11 +13,14 @@ module Gitosis
         @@forkers[method]
       end
     end
+
+    def all
+      @@forkers.keys
+    end
   end
 
   def forkers(&block)
-    puts "Forkers being called"
-    @@forkers = Forker.new(&block)
+    block_given? ? @@forkers = Forker.new(&block) : @@forkers
   end
 end
 

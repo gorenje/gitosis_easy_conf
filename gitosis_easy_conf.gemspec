@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{gitosis_easy_conf}
-  s.version = "0.0.0"
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Gerrit Riessen"]
@@ -18,11 +18,18 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     ".document",
+    ".rvmrc",
     "Gemfile",
     "LICENSE.txt",
     "README.rdoc",
     "Rakefile",
+    "VERSION",
+    "gitosis_easy_conf.gemspec",
     "lib/gitosis_easy_conf.rb",
+    "lib/gitosis_easy_conf/config.rb",
+    "lib/gitosis_easy_conf/forkers.rb",
+    "lib/gitosis_easy_conf/groups.rb",
+    "lib/gitosis_easy_conf/repositories.rb",
     "test/helper.rb",
     "test/test_gitosis_easy_conf.rb"
   ]
