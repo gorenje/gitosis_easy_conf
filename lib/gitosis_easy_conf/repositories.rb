@@ -25,6 +25,8 @@ module Gitosis
     end
 
     def method_missing(method, *args, &block)
+      method = (args.first[:name] || method).to_sym
+
       committers = [args.first[:writable]].flatten.compact.collect do |member|
         Gitosis.groups[member]
       end.flatten
