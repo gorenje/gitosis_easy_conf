@@ -31,7 +31,9 @@ Gem::Specification.new do |s|
     "lib/gitosis_easy_conf/groups.rb",
     "lib/gitosis_easy_conf/repositories.rb",
     "test/helper.rb",
-    "test/test_gitosis_easy_conf.rb"
+    "test/test_gitosis_config.rb",
+    "test/test_gitosis_forker.rb",
+    "test/test_gitosis_repositories.rb"
   ]
   s.homepage = %q{https://github.com/gorenje/gitosis_easy_conf}
   s.licenses = ["MIT"]
@@ -46,6 +48,13 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<gitosis_easy_conf>, [">= 0"])
       s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_development_dependency(%q<rake>, [">= 0"])
+      s.add_development_dependency(%q<inifile>, [">= 0"])
+      s.add_development_dependency(%q<rdoc>, [">= 0"])
+      s.add_development_dependency(%q<rcov>, [">= 0"])
+      s.add_development_dependency(%q<rr>, [">= 0"])
+      s.add_development_dependency(%q<shoulda>, [">= 0"])
+      s.add_development_dependency(%q<rake>, [">= 0"])
+      s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<inifile>, [">= 0"])
       s.add_development_dependency(%q<rdoc>, [">= 0"])
       s.add_development_dependency(%q<rcov>, [">= 0"])
@@ -73,12 +82,26 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rdoc>, [">= 0"])
       s.add_dependency(%q<rcov>, [">= 0"])
       s.add_dependency(%q<rr>, [">= 0"])
+      s.add_dependency(%q<shoulda>, [">= 0"])
+      s.add_dependency(%q<rake>, [">= 0"])
+      s.add_dependency(%q<jeweler>, [">= 0"])
+      s.add_dependency(%q<inifile>, [">= 0"])
+      s.add_dependency(%q<rdoc>, [">= 0"])
+      s.add_dependency(%q<rcov>, [">= 0"])
+      s.add_dependency(%q<rr>, [">= 0"])
       s.add_dependency(%q<inifile>, [">= 0"])
     end
   else
     s.add_dependency(%q<gitosis_easy_conf>, [">= 0"])
     s.add_dependency(%q<shoulda>, [">= 0"])
     s.add_dependency(%q<rake>, [">= 0"])
+    s.add_dependency(%q<inifile>, [">= 0"])
+    s.add_dependency(%q<rdoc>, [">= 0"])
+    s.add_dependency(%q<rcov>, [">= 0"])
+    s.add_dependency(%q<rr>, [">= 0"])
+    s.add_dependency(%q<shoulda>, [">= 0"])
+    s.add_dependency(%q<rake>, [">= 0"])
+    s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<inifile>, [">= 0"])
     s.add_dependency(%q<rdoc>, [">= 0"])
     s.add_dependency(%q<rcov>, [">= 0"])
