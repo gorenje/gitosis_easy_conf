@@ -38,5 +38,5 @@ module Gitosis
   def groups(&block)
     block_given? ? @@groups = Group.new(&block).denormalize : @@groups
   end
+  alias :roles :groups
 end
-

@@ -6,6 +6,8 @@ module Gitosis
   class Repository
     def initialize(&block)
       @conffile = IniFile.new(Gitosis.config.filename)
+      @conffile["gitosis"] = {}
+
       @origconffile = @conffile.clone
 
       @fork_name = Gitosis.config.fork_naming_convention || lambda do |repo,forker|
@@ -33,7 +35,7 @@ module Gitosis
 
       @conffile["group #{method}.writable"] = {
         'members' => committers.join(' '),
-        'writable' => method
+        'writable' => method.to_s
       }
 
       readers = [args.first[:readable]].flatten.compact.collect do |member|
@@ -42,7 +44,7 @@ module Gitosis
 
       @conffile["group #{method}.readonly"] = {
         'members' => readers.join(' '),
-        'readonly' => method
+        'readonly' => method.to_s
       } unless readers.empty?
 
       [args.first[:forks]].flatten.compact.
