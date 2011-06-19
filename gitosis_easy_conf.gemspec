@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{gitosis_easy_conf}
-  s.version = "0.0.1"
+  s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Gerrit Riessen"]
-  s.date = %q{2011-06-16}
+  s.date = %q{2011-06-19}
   s.description = %q{Easy gitosis configuration}
   s.email = %q{gerrit.riessen@gmail.com}
   s.extra_rdoc_files = [
@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
     "test/helper.rb",
     "test/test_gitosis_config.rb",
     "test/test_gitosis_forker.rb",
+    "test/test_gitosis_groups.rb",
     "test/test_gitosis_repositories.rb"
   ]
   s.homepage = %q{https://github.com/gorenje/gitosis_easy_conf}
@@ -48,6 +49,13 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<gitosis_easy_conf>, [">= 0"])
       s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_development_dependency(%q<rake>, [">= 0"])
+      s.add_development_dependency(%q<inifile>, [">= 0"])
+      s.add_development_dependency(%q<rdoc>, [">= 0"])
+      s.add_development_dependency(%q<rcov>, [">= 0"])
+      s.add_development_dependency(%q<rr>, [">= 0"])
+      s.add_development_dependency(%q<shoulda>, [">= 0"])
+      s.add_development_dependency(%q<rake>, [">= 0"])
+      s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<inifile>, [">= 0"])
       s.add_development_dependency(%q<rdoc>, [">= 0"])
       s.add_development_dependency(%q<rcov>, [">= 0"])
@@ -89,12 +97,26 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rdoc>, [">= 0"])
       s.add_dependency(%q<rcov>, [">= 0"])
       s.add_dependency(%q<rr>, [">= 0"])
+      s.add_dependency(%q<shoulda>, [">= 0"])
+      s.add_dependency(%q<rake>, [">= 0"])
+      s.add_dependency(%q<jeweler>, [">= 0"])
+      s.add_dependency(%q<inifile>, [">= 0"])
+      s.add_dependency(%q<rdoc>, [">= 0"])
+      s.add_dependency(%q<rcov>, [">= 0"])
+      s.add_dependency(%q<rr>, [">= 0"])
       s.add_dependency(%q<inifile>, [">= 0"])
     end
   else
     s.add_dependency(%q<gitosis_easy_conf>, [">= 0"])
     s.add_dependency(%q<shoulda>, [">= 0"])
     s.add_dependency(%q<rake>, [">= 0"])
+    s.add_dependency(%q<inifile>, [">= 0"])
+    s.add_dependency(%q<rdoc>, [">= 0"])
+    s.add_dependency(%q<rcov>, [">= 0"])
+    s.add_dependency(%q<rr>, [">= 0"])
+    s.add_dependency(%q<shoulda>, [">= 0"])
+    s.add_dependency(%q<rake>, [">= 0"])
+    s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<inifile>, [">= 0"])
     s.add_dependency(%q<rdoc>, [">= 0"])
     s.add_dependency(%q<rcov>, [">= 0"])
