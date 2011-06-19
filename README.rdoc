@@ -26,7 +26,7 @@ The following config.rb is an example:
           fork_naming_convention do |repo, forker|
             "#{forker}_#{repo}"
           end
-          filename "gitosis.conf"
+          filename "gitosis.readme.conf"
         end
 
         Gitosis.forkers do
@@ -43,144 +43,17 @@ The following config.rb is an example:
           all_developers :admins, :developers
         end
 
-        developer_forks_and_deployable = {
-          :writable => :admins,
-          :readable => [:all_developers, :deployers],
-          :forks => :all
-        }
-
         Gitosis.repositories do
-          rails_app_one    developer_forks_and_deployable
-          rails_app_two    developer_forks_and_deployable
-          rails_app_three  developer_forks_and_deployable
+          with_base_configuration( :writable => :admins,
+                                   :readable => [:all_developers, :deployers],
+                                   :forks    => :all ) do
+            rails_app_one
+            rails_app_two
+            rails_app_three
+          end
         end
 
-would produce the follwing gitosis.conf:
-
-        [gitosis]
-
-        [group rails_app_one.writable]
-        members = dev.one dev.two
-        writable = rails_app_one
-
-        [group rails_app_one.readonly]
-        members = dev.one dev.two dev.three dev.four app1.deploy app2.deploy
-        readonly = rails_app_one
-
-        [group fork.rails_app_one.developer1.writable]
-        members = dev.one
-        writable = developer1_rails_app_one
-
-        [group fork.rails_app_one.developer1.readonly]
-        members = dev.two dev.three dev.four app1.deploy app2.deploy
-        readonly = developer1_rails_app_one
-
-        [group fork.rails_app_one.developer2.writable]
-        members = dev.two
-        writable = developer2_rails_app_one
-
-        [group fork.rails_app_one.developer2.readonly]
-        members = dev.one dev.three dev.four app1.deploy app2.deploy
-        readonly = developer2_rails_app_one
-
-        [group fork.rails_app_one.developer3.writable]
-        members = dev.three
-        writable = developer3_rails_app_one
-
-        [group fork.rails_app_one.developer3.readonly]
-        members = dev.one dev.two dev.four app1.deploy app2.deploy
-        readonly = developer3_rails_app_one
-
-        [group fork.rails_app_one.developer4.writable]
-        members = dev.four
-        writable = developer4_rails_app_one
-
-        [group fork.rails_app_one.developer4.readonly]
-        members = dev.one dev.two dev.three app1.deploy app2.deploy
-        readonly = developer4_rails_app_one
-
-        [group rails_app_two.writable]
-        members = dev.one dev.two
-        writable = rails_app_two
-
-        [group rails_app_two.readonly]
-        members = dev.one dev.two dev.three dev.four app1.deploy app2.deploy
-        readonly = rails_app_two
-
-        [group fork.rails_app_two.developer1.writable]
-        members = dev.one
-        writable = developer1_rails_app_two
-
-        [group fork.rails_app_two.developer1.readonly]
-        members = dev.two dev.three dev.four app1.deploy app2.deploy
-        readonly = developer1_rails_app_two
-
-        [group fork.rails_app_two.developer2.writable]
-        members = dev.two
-        writable = developer2_rails_app_two
-
-        [group fork.rails_app_two.developer2.readonly]
-        members = dev.one dev.three dev.four app1.deploy app2.deploy
-        readonly = developer2_rails_app_two
-
-        [group fork.rails_app_two.developer3.writable]
-        members = dev.three
-        writable = developer3_rails_app_two
-
-        [group fork.rails_app_two.developer3.readonly]
-        members = dev.one dev.two dev.four app1.deploy app2.deploy
-        readonly = developer3_rails_app_two
-
-        [group fork.rails_app_two.developer4.writable]
-        members = dev.four
-        writable = developer4_rails_app_two
-
-        [group fork.rails_app_two.developer4.readonly]
-        members = dev.one dev.two dev.three app1.deploy app2.deploy
-        readonly = developer4_rails_app_two
-
-        [group rails_app_three.writable]
-        members = dev.one dev.two
-        writable = rails_app_three
-
-        [group rails_app_three.readonly]
-        members = dev.one dev.two dev.three dev.four app1.deploy app2.deploy
-        readonly = rails_app_three
-
-        [group fork.rails_app_three.developer1.writable]
-        members = dev.one
-        writable = developer1_rails_app_three
-
-        [group fork.rails_app_three.developer1.readonly]
-        members = dev.two dev.three dev.four app1.deploy app2.deploy
-        readonly = developer1_rails_app_three
-
-        [group fork.rails_app_three.developer2.writable]
-        members = dev.two
-        writable = developer2_rails_app_three
-
-        [group fork.rails_app_three.developer2.readonly]
-        members = dev.one dev.three dev.four app1.deploy app2.deploy
-        readonly = developer2_rails_app_three
-
-        [group fork.rails_app_three.developer3.writable]
-        members = dev.three
-        writable = developer3_rails_app_three
-
-        [group fork.rails_app_three.developer3.readonly]
-        members = dev.one dev.two dev.four app1.deploy app2.deploy
-        readonly = developer3_rails_app_three
-
-        [group fork.rails_app_three.developer4.writable]
-        members = dev.four
-        writable = developer4_rails_app_three
-
-        [group fork.rails_app_three.developer4.readonly]
-        members = dev.one dev.two dev.three app1.deploy app2.deploy
-        readonly = developer4_rails_app_three
-
-Of course, each repository still needs to be created and the corresponding master repo
-needs to be pushed into the repos, however the permissions are set correctly.
+The result of this configuration can be found in the examples directory.
 
 == Contributing to gitosis_easy_conf
 

@@ -1,0 +1,156 @@
+require 'rubygems'
+require 'bundler'
+begin
+  Bundler.setup(:default, :development)
+rescue Bundler::BundlerError => e
+  $stderr.puts e.message
+  $stderr.puts "Run `bundle install` to install missing gems"
+  exit e.status_code
+end
+
+require 'inifile'
+
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+$LOAD_PATH.unshift(File.dirname(__FILE__))
+require 'gitosis_easy_conf'
+
+namespace :gitosis_easy_conf do
+  namespace :examples do
+
+    desc <<-EOF
+      From the readme.
+
+      Four developers, three rails application and two servers to which the applications
+      are deployed. Developers One and Two are committers and can push to master repositories,
+      developers Three and Four each have their own forks of all three rails application.
+    EOF
+    task :readme do
+      Gitosis.config do
+        fork_naming_convention do |repo, forker|
+          "#{forker}_#{repo}"
+        end
+        filename "gitosis.readme.conf"
+      end
+
+      Gitosis.forkers do
+        developer1 'dev.one'
+        developer2 'dev.two'
+        developer3 'dev.three'
+        developer4 'dev.four'
+      end
+
+      Gitosis.groups do
+        admins         Forker[:developer1], Forker[:developer2]
+        developers     Forker[:developer3], Forker[:developer4]
+        deployers      'app1.deploy', 'app2.deploy'
+        all_developers :admins, :developers
+      end
+
+      Gitosis.repositories do
+        with_base_configuration( :writable => :admins,
+                                 :readable => [:all_developers, :deployers],
+                                 :forks    => :all ) do
+          rails_app_one
+          rails_app_two
+          rails_app_three
+        end
+      end
+    end
+
+
+    desc <<-EOF
+      Complex example:
+       - 3 application repos: blog_app, www_app, api_app
+       - 1 repo for common db configuration: db_config
+       - 1 repo with common gem used across all rails apps: common_gem
+       - 2 admin repos: chef, gitosis-admin
+
+      Team consists of a cto, lead developer, 4 developers and one unix admin. What we
+      want is that each developer has a fork of the rails applications on which they
+      are working but only the cto and lead developer can commit to the master repositories
+      of the rails applicatoins. The cto does not have a fork repo but the leader developer
+      as a fork of all three rails applications.
+
+      The four developers can fork and access the common_gem and can commit to the master
+      repositoty of the common_gem.
+
+      Only the cto and lead developer can commit to the db_config repo. Also only the deployers
+      can read the db_config repo (the deployers are the deploy users on the servers and
+      not physical people). The developers can't read nor write to db_config. (db_config
+      contains the production configuration for databases and API keys.)
+
+      The unix admin, cto and lead developer can commit to the chef and gitosis-admin repos.
+      The developers can read them but don't have a fork of either.
+
+      We'll end up with the following 17 repositories:
+               blog_app
+               dev_fours_fork_of_blog_app
+               dev_threes_fork_of_blog_app
+               dev_lead_devs_fork_of_blog_app
+               www_app
+               dev_fours_fork_of_www_app
+               dev_twos_fork_of_www_app
+               dev_lead_devs_fork_of_www_app
+               api_app
+               dev_ones_fork_of_api_app
+               dev_threes_fork_of_api_app
+               dev_twos_fork_of_api_app
+               dev_lead_devs_fork_of_api_app
+               common_gem
+               chef
+               gitosis-admin
+               db_config
+    EOF
+    task :complex do
+      Gitosis.config do
+        filename "gitosis.complex.conf"
+        fork_naming_convention do |repo, forker|
+          "#{forker}s_fork_of_#{repo}"
+        end
+      end
+
+      Gitosis.forkers do
+        dev_cto      'dev_cto.key'
+        dev_lead_dev 'dev_lead_dev.key'
+
+        dev_one   'dev_one.key'
+        dev_two   'dev_two.key'
+        dev_three 'dev_three.key'
+        dev_four  'dev_four.key'
+      end
+
+      Gitosis.roles do
+        committers Forker[:dev_cto], Forker[:dev_lead_dev]
+        admins 'unix.admin', :committers
+
+        blog_developers Forker[:dev_four], Forker[:dev_three]
+        www_developers Forker[:dev_four], Forker[:dev_two]
+        api_developers Forker[:dev_one], Forker[:dev_three], Forker[:dev_two]
+
+        all_developers :blog_developers, :committers, :www_developers, :api_developers
+        deployers 'app1.deploy', 'app2.deploy', 'app3.deploy'
+      end
+
+      Gitosis.repositories do
+        # rails applications (blog, www and api) and common gem.
+        with_base_configuration(:writable => :committers,
+                                :readable => [:all_developers, :deployers]) do
+          blog_app :forks => [:dev_four, :dev_three, :dev_lead_dev]
+          www_app :forks => [:dev_four, :dev_two, :dev_lead_dev]
+          api_app :forks => [:dev_one, :dev_three, :dev_two, :dev_lead_dev]
+          common_gem :writable => :all_developers
+        end
+
+        # chef and gitosis-admin. Note there are no forks these repos, only master.
+        with_base_configuration(:writable => :admins,
+                                :readable => :all_developers) do
+          chef
+          gitosis_admin :name => 'gitosis-admin'
+        end
+
+        # production database configuration
+        db_config :writable => :committers, :readable => :deployers
+      end
+    end
+  end
+end
