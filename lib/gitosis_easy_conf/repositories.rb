@@ -29,21 +29,22 @@ module Gitosis
     end
 
     def with_base_configuration(config,&block)
-      @base_config = config
+      @base_config = config || EmptyConfig
       instance_eval(&block)
       @base_config = EmptyConfig
     end
 
     def method_missing(method, *args, &block)
+      args = [{}] if args.first.nil?
       method = (args.first[:name] || method).to_sym
 
+      committers = _get_keys([@base_config,args.first].map{|h| h[:writable]})
       @conffile["group #{method}.writable"] = {
-        'members'  => _get_keys([@base_config,args.first].map{|h| h[:writable]}),
+        'members'  => committers,
         'writable' => method.to_s
-      }
+      } unless committers == ""
 
       readers = _get_keys([@base_config,args.first].map{|h| h[:readable]})
-
       @conffile["group #{method}.readonly"] = {
         'members'  => readers,
         'readonly' => method.to_s

@@ -72,6 +72,19 @@ class TestGitosisRepositories < Test::Unit::TestCase
       mock(IniFile).new("fubar") { @results }
     end
 
+    should "handle the simplest case" do
+      Gitosis.config do
+        filename "fubar"
+      end
+      Gitosis.repositories do
+        with_base_configuration({}) do
+          empty_repo
+          another_empty_repo
+        end
+      end
+      assert_config({}, "simplest case")
+    end
+
     should "provide a base_configuration stanza" do
       Gitosis.config do
         filename "fubar"
@@ -82,6 +95,7 @@ class TestGitosisRepositories < Test::Unit::TestCase
           gitosis_admin :readable => 'dev.four'
           another_repo :writable => 'another.developer'
           a_third_repo :name => 'fubar-a-third-repo'
+          a_fourth_repo
         end
         no_base_config_repo :writable => 'me.you.them'
       end
@@ -113,7 +127,15 @@ class TestGitosisRepositories < Test::Unit::TestCase
                       "group no_base_config_repo.writable" => {
                         "members" => "me.you.them",
                         "writable" => "no_base_config_repo"
-                      }
+                      },
+                      "group a_fourth_repo.readonly" => {
+                        "members" => "key.three",
+                        "readonly" => "a_fourth_repo"
+                      },
+                      "group a_fourth_repo.writable" => {
+                        "members" => "key.one key.two",
+                        "writable" => "a_fourth_repo"
+                      },
                     },"with base config")
     end
 
