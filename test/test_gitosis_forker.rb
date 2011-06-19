@@ -13,15 +13,19 @@ class TestGitosisForker < Test::Unit::TestCase
       assert_equal "one", Gitosis.forkers['fubar']
     end
 
-    should "return nil for unknown forkers" do
+    should "raise error for unknown forkers" do
       Gitosis.forkers do
         fubar("one", "two") do
           nil
         end
       end
 
-      assert_nil Gitosis.forkers[:fuabr]
-      assert_nil Gitosis.forkers.fuabr
+      assert_raises Gitosis::UnknownForker do
+        Gitosis.forkers[:fuabr]
+      end
+      assert_raises Gitosis::UnknownForker do
+        Gitosis.forkers.fuabr
+      end
     end
 
     should "have shortcut method" do
@@ -34,8 +38,12 @@ class TestGitosisForker < Test::Unit::TestCase
       assert_raises Gitosis::UnknownForker do
         Forker["unknonw"]
       end
-      assert_nil Gitosis.forkers['unknonw']
-      assert_nil Gitosis.forkers.unknonw
+      assert_raises Gitosis::UnknownForker do
+        Gitosis.forkers['unknonw']
+      end
+      assert_raises Gitosis::UnknownForker do
+        Gitosis.forkers.unknonw
+      end
 
       assert_equal "one", Forker["fubar"]
       assert_equal "one", Forker[:fubar]

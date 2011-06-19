@@ -18,6 +18,28 @@ namespace :gitosis_easy_conf do
   namespace :examples do
 
     desc <<-EOF
+      Concise example.
+    EOF
+    task :concise do
+      Gitosis.setup("gitosis.concise.conf") do
+        config do
+          fork_naming_convention do |repo,forker|
+            "#{repo}_been_forked_by_#{forker}"
+          end
+        end
+
+        forkers do
+          dev1 "dev.one"
+          dev2 "dev.two"
+        end
+
+        repositories do
+          test_one :writable => Forker[:dev1], :forks => :dev2, :readable => Forker[:dev2]
+        end
+      end
+    end
+
+    desc <<-EOF
       From the readme.
 
       Four developers, three rails application and two servers to which the applications
@@ -57,9 +79,10 @@ namespace :gitosis_easy_conf do
       end
     end
 
-
     desc <<-EOF
-      Complex example:
+      Complex example.
+
+      Following setup:
        - 3 application repos: blog_app, www_app, api_app
        - 1 repo for common db configuration: db_config
        - 1 repo with common gem used across all rails apps: common_gem

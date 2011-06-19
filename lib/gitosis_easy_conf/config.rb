@@ -1,6 +1,4 @@
 module Gitosis
-  extend self
-
   class Config
     def initialize(&block)
       @configs = {}

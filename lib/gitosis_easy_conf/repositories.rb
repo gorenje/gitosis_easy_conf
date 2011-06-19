@@ -3,8 +3,6 @@
 require 'inifile'
 
 module Gitosis
-  extend self
-
   EmptyConfig = {
     :writable => [], :readable => [], :forks => []
   }

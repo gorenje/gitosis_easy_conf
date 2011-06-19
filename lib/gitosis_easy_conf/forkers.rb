@@ -7,8 +7,6 @@
 # are equivalent.
 #
 module Gitosis
-  extend self
-
   class Forker
     def initialize(&block)
       @forkers = {}
@@ -30,6 +28,8 @@ module Gitosis
 
         @forkers[method] = args.first.to_s
       else
+        raise(Gitosis::UnknownForker,
+              "Forker '#{method}' Not Found") unless @forkers.keys.include?(method)
         @forkers[method]
       end
     end
@@ -43,4 +43,3 @@ module Gitosis
     end
   end
 end
-

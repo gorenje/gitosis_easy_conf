@@ -72,6 +72,56 @@ class TestGitosisRepositories < Test::Unit::TestCase
       mock(IniFile).new("fubar") { @results }
     end
 
+    should "have a concise form" do
+      Gitosis.setup("fubar") do
+        config do
+          fork_naming_convention do |*args|
+            "[%s+%s]" % args.map{ |a| a.to_s }
+          end
+        end
+
+        forkers do
+          dev1 "dev.one"
+          dev2 "dev.two"
+        end
+
+        roles do
+          admin "dev.three"
+        end
+
+        repositories do
+          test_one :writable => Forker[:dev1], :forks => :dev2, :readable => Forker[:dev2]
+          test_two :writable => :admin, :readable => Forker[:dev1]
+        end
+      end
+
+      assert_config({ "group fork.test_one.dev2.readonly" => {
+                        "members" => "dev.two",
+                        "readonly" => "[test_one+dev2]"
+                      },
+                      "group fork.test_one.dev2.writable" => {
+                        "members" => "dev.two",
+                        "writable" => "[test_one+dev2]"
+                      },
+                      "group test_one.readonly" => {
+                        "members" => "dev.two",
+                        "readonly" => "test_one"
+                      },
+                      "group test_one.writable" => {
+                        "members" => "dev.one",
+                        "writable" => "test_one"
+                      },
+                      "group test_two.readonly" => {
+                        "members" => "dev.one",
+                        "readonly" => "test_two"
+                      },
+                      "group test_two.writable" => {
+                        "members" => "dev.three",
+                        "writable" => "test_two"
+                      }
+                    }, "concise setup")
+    end
+
     should "handle the simplest case" do
       Gitosis.config do
         filename "fubar"

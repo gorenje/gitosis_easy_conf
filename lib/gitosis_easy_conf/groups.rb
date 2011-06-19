@@ -17,8 +17,6 @@
 # Duplicate key names are removed and returned is a concatenation of all keys.
 #
 module Gitosis
-  extend self
-
   class Group
 
     def initialize(&block)

@@ -4,6 +4,8 @@ require 'gitosis_easy_conf/forkers'
 require 'gitosis_easy_conf/config'
 
 module Gitosis
+  extend self
+
   # Exceptions
   %w[
     SelfReferencingGroup     UnknownForker            UnknownGroup
@@ -15,7 +17,15 @@ module Gitosis
 
   # Configuration verbs -- config, forkers, groups (or roles) and repositories.
   def config(&block)
-    block_given? ? @@config = Config.new(&block) : (@@config ||= nil)
+    if block_given?
+      if defined?(@@config)
+        @@config.instance_eval(&block)
+      else
+        @@config = Config.new(&block)
+      end
+    else
+      @@config ||= Config.new(){}
+    end
   end
 
   def forkers(&block)
@@ -29,16 +39,22 @@ module Gitosis
 
   def repositories(&block)
     Repository.new(&block).write
+    @@config = Config.new(){}
+  end
+
+  def setup(filename = nil, &block)
+    config do
+      filename filename
+    end if filename
+
+    class_eval(&block)
   end
 end
 
-# shortcut to access the forkers.
 class Forker
   class << self
     def [](name)
-      t = Gitosis.forkers.send(name.to_sym)
-      raise Gitosis::UnknownForker, "Forker '#{name}' Not Found" unless t
-      t
+      Gitosis.forkers.send(name.to_sym)
     end
   end
 end
