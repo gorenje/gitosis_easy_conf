@@ -31,7 +31,7 @@ class TestGitosisForker < Test::Unit::TestCase
         end
       end
 
-      assert_raises ArgumentError do
+      assert_raises Gitosis::UnknownForker do
         Forker["unknonw"]
       end
       assert_nil Gitosis.forkers['unknonw']
@@ -56,22 +56,28 @@ class TestGitosisForker < Test::Unit::TestCase
     end
 
     should "complain if using the duplicate pub keys" do
-      assert_raises ArgumentError do
+      assert_raises Gitosis::SamePublicKeyForForkers do
         Gitosis.forkers do
           fubar  "has.key"
           fubar2 "has.key"
         end
       end
-      assert_raises ArgumentError do
+      assert_raises Gitosis::SamePublicKeyForForkers do
         Gitosis.forkers do
           fubar  "haskey"
           fubar2 :haskey
         end
       end
+      assert_raises Gitosis::SamePublicKeyForForkers do
+        Gitosis.forkers do
+          fubar "has.key"
+          fubar "has.key"
+        end
+      end
     end
 
     should "complain if using the same forker name" do
-      assert_raises ArgumentError do
+      assert_raises Gitosis::ForkerAlreadyDefined do
         Gitosis.forkers do
           fubar "has.key"
           fubar "has.key.2"

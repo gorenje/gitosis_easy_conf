@@ -60,10 +60,18 @@ class TestGitosisConfig < Test::Unit::TestCase
       end
       assert_equal Proc,  Gitosis.config.fork_naming_convention.class
       assert_equal "1+2", Gitosis.config.fork_naming_convention.call("1","2")
+
+      Gitosis.config do
+        fork_naming_convention do |*args|
+          '%s+%s' % args.map { |a| a.to_s }
+        end
+      end
+      assert_equal Proc,  Gitosis.config.fork_naming_convention.class
+      assert_equal "1+2", Gitosis.config.fork_naming_convention.call("1","2")
     end
 
     should "fork_name_convention should complain if arity is not correct" do
-      assert_raises ArgumentError do
+      assert_raises Gitosis::BlockArityIncorrect do
         Gitosis.config do
           fork_naming_convention("fubar","snafu") do
             nil
@@ -71,7 +79,7 @@ class TestGitosisConfig < Test::Unit::TestCase
         end
       end
 
-      assert_raises ArgumentError do
+      assert_raises Gitosis::BlockArityIncorrect do
         Gitosis.config do
           fork_naming_convention("fubar","snafu") do |a|
             nil
@@ -79,7 +87,7 @@ class TestGitosisConfig < Test::Unit::TestCase
         end
       end
 
-      assert_raises ArgumentError do
+      assert_raises Gitosis::BlockArityIncorrect do
         Gitosis.config do
           fork_naming_convention("fubar","snafu") do |a,b,c|
             nil

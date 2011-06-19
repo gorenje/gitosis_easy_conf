@@ -1,10 +1,17 @@
+# Definition of a gitosis repository.
+#
 require 'inifile'
 
 module Gitosis
   extend self
 
+  EmptyConfig = {
+    :writable => [], :readable => [], :forks => []
+  }
+
   class Repository
     def initialize(&block)
+      @base_config = EmptyConfig
       @conffile = IniFile.new(Gitosis.config.filename)
       @conffile["gitosis"] = {}
 
@@ -18,51 +25,58 @@ module Gitosis
     end
 
     def write
-      if @conffile.eql?(@origconffile)
-        puts "No changes, no update of #{Gitosis.config.filename}"
-      else
-        puts "Updating #{Gitosis.config.filename}"
-        @conffile.write
-      end
+      @conffile.write unless @conffile.eql?(@origconffile)
+    end
+
+    def with_base_configuration(config,&block)
+      @base_config = config
+      instance_eval(&block)
+      @base_config = EmptyConfig
     end
 
     def method_missing(method, *args, &block)
       method = (args.first[:name] || method).to_sym
 
-      committers = [args.first[:writable]].flatten.compact.collect do |member|
-        Gitosis.groups[member]
-      end.flatten
-
       @conffile["group #{method}.writable"] = {
-        'members' => committers.join(' '),
+        'members'  => _get_keys([@base_config,args.first].map{|h| h[:writable]}),
         'writable' => method.to_s
       }
 
-      readers = [args.first[:readable]].flatten.compact.collect do |member|
-        Gitosis.groups[member]
-      end.flatten
+      readers = _get_keys([@base_config,args.first].map{|h| h[:readable]})
 
       @conffile["group #{method}.readonly"] = {
-        'members' => readers.join(' '),
+        'members'  => readers,
         'readonly' => method.to_s
-      } unless readers.empty?
+      } unless readers == ""
 
-      [args.first[:forks]].flatten.compact.
+      [@base_config,args.first].map{|h| h[:forks]}.flatten.compact.
         collect { |a| a == :all ? Gitosis.forkers.all : a }.flatten.compact.each do |forker|
+
+        fork_repo_name = @fork_name.call(method,forker)
+
         @conffile["group fork.#{method}.#{forker}.writable"] = {
-          'members' => ::Forker[forker],
-          'writable' => @fork_name.call(method,forker)
+          'members'  => ::Forker[forker],
+          'writable' => fork_repo_name,
         }
+
         @conffile["group fork.#{method}.#{forker}.readonly"] = {
-          'members' => readers.join(' '),
-          'readonly' => @fork_name.call(method,forker)
-        }
+          'members'  => readers,
+          'readonly' => fork_repo_name,
+        } unless readers == ""
       end
     end
-  end
 
-  def repositories(&block)
-    Repository.new(&block).write
+    private
+
+    def _get_keys(ary)
+      ary.flatten.compact.collect do |member|
+        case member
+        when String then member
+        when Symbol then Gitosis.groups[member]
+        else
+          raise UnknownGroup, "Group '#{member}'"
+        end
+      end.flatten.join(' ')
+    end
   end
 end
-

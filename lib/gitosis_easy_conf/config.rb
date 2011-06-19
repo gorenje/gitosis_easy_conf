@@ -11,8 +11,8 @@ module Gitosis
       if args.length > 0 || block_given?
         @configs[method] = case method
                            when :fork_naming_convention then
-                             if block_given? && block.arity != 2
-                               raise ArgumentError,"Block needs to take 2 arguments"
+                             if block_given? && ![2,-1].include?(block.arity)
+                               raise BlockArityIncorrect, "Block needs exactly two arguments"
                              end
                              block
                            when :filename then
@@ -24,9 +24,5 @@ module Gitosis
         @configs[method]
       end
     end
-  end
-
-  def config(&block)
-    block_given? ? @@config = Config.new(&block) : (@@config ||= nil)
   end
 end

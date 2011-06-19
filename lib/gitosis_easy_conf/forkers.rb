@@ -1,3 +1,11 @@
+# Define a mapping from a Gitosis user and their public key. Here the use of string and
+# symbol are unimportant, i.e.
+#   Gitosis.forkers do
+#      fubar :key_one
+#      fubar "key_one"
+#   end
+# are equivalent.
+#
 module Gitosis
   extend self
 
@@ -11,12 +19,12 @@ module Gitosis
       if args.length > 0
 
         if @forkers.values.include?(args.first.to_s)
-          raise(ArgumentError, "Public key '#{args.first.to_s}' has duplicate usage: " +
-                "#{method} and #{@forkers.invert[args.first.to_s]}")
+          raise(SamePublicKeyForForkers, "Key '#{args.first}' used by '#{method}' "+
+                "and #{@forkers.invert[args.first.to_s]}'")
         end
 
         if @forkers.keys.include?(method)
-          raise(ArgumentError, "Forker '#{method}' already has key: " +
+          raise(ForkerAlreadyDefined, "Forker '#{method}' already defined with key: " +
                 "#{@forkers[method]}")
         end
 
@@ -34,18 +42,5 @@ module Gitosis
       @forkers.keys
     end
   end
-
-  def forkers(&block)
-    block_given? ? @@forkers = Forker.new(&block) : (@@forkers ||= nil)
-  end
 end
 
-class Forker
-  class << self
-    def [](name)
-      t = Gitosis.forkers.send(name.to_sym)
-      raise ArgumentError, "Forker '#{name}' Not Found" unless t
-      t
-    end
-  end
-end
