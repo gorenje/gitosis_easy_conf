@@ -38,16 +38,16 @@ module Gitosis
   alias :roles :groups
 
   def repositories(&block)
-    Repository.new(&block).write
-    @@config = Config.new(){}
+    block_given? ? @@repository = Repository.new(&block) : @@repository
   end
 
   def setup(filename = nil, &block)
     config do
       filename filename
-    end if filename
+    end
 
     class_eval(&block)
+    repositories.write
   end
 end
 

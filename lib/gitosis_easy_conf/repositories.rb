@@ -10,9 +10,16 @@ module Gitosis
   class Repository
     def initialize(&block)
       @base_config = EmptyConfig
-      @conffile = IniFile.new(Gitosis.config.filename)
-      @conffile["gitosis"] = {}
 
+      conf_file_name = Gitosis.config.filename
+      @no_file_found = if conf_file_name.nil? or !File.exists?(conf_file_name)
+                         @conffile = {}
+                         true
+                       else
+                         @conffile = IniFile.new(conf_file_name)
+                         false
+                       end
+      @conffile["gitosis"] = {}
       @origconffile = @conffile.clone
 
       @fork_name = Gitosis.config.fork_naming_convention || lambda do |repo,forker|
@@ -23,7 +30,7 @@ module Gitosis
     end
 
     def write
-      @conffile.write unless @conffile.eql?(@origconffile)
+      @conffile.write unless @conffile.eql?(@origconffile) || @no_file_found
     end
 
     def with_base_configuration(config,&block)
@@ -34,31 +41,31 @@ module Gitosis
 
     def method_missing(method, *args, &block)
       args = [{}] if args.first.nil?
-      method = (args.first[:name] || method).to_sym
+      repo_name = (args.first[:name] || method).to_sym
 
       committers = _get_keys([@base_config,args.first].map{|h| h[:writable]})
-      @conffile["group #{method}.writable"] = {
+      @conffile["group #{repo_name}.writable"] = {
         'members'  => committers,
-        'writable' => method.to_s
+        'writable' => repo_name.to_s
       } unless committers == ""
 
       readers = _get_keys([@base_config,args.first].map{|h| h[:readable]})
-      @conffile["group #{method}.readonly"] = {
+      @conffile["group #{repo_name}.readonly"] = {
         'members'  => readers,
-        'readonly' => method.to_s
+        'readonly' => repo_name.to_s
       } unless readers == ""
 
-      [@base_config,args.first].map{|h| h[:forks]}.flatten.compact.
+      [@base_config, args.first].map { |h| h[:forks] }.flatten.compact.
         collect { |a| a == :all ? Gitosis.forkers.all : a }.flatten.compact.each do |forker|
 
-        fork_repo_name = @fork_name.call(method,forker)
+        fork_repo_name = @fork_name.call(repo_name,forker)
 
-        @conffile["group fork.#{method}.#{forker}.writable"] = {
+        @conffile["group fork.#{repo_name}.#{forker}.writable"] = {
           'members'  => ::Forker[forker],
           'writable' => fork_repo_name,
         }
 
-        @conffile["group fork.#{method}.#{forker}.readonly"] = {
+        @conffile["group fork.#{repo_name}.#{forker}.readonly"] = {
           'members'  => readers,
           'readonly' => fork_repo_name,
         } unless readers == ""
