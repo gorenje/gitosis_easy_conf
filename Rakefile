@@ -9,28 +9,17 @@ rescue Bundler::BundlerError => e
   $stderr.puts "Run `bundle install` to install missing gems"
   exit e.status_code
 end
+require 'rake'
 
 require 'jeweler'
 Jeweler::Tasks.new do |gem|
-  # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
-  gem.name = "gitosis_easy_conf"
-  gem.homepage = "https://github.com/gorenje/gitosis_easy_conf"
-  gem.license = "MIT"
-  gem.summary = %Q{Make writing a gitosis configuration easier}
+  gem.name        = "gitosis_easy_conf"
+  gem.homepage    = "http://github.com/gorenje/gitosis_easy_conf"
+  gem.license     = "MIT"
+  gem.summary     = %Q{Make writing a gitosis configuration easier}
   gem.description = %Q{Easy gitosis configuration}
-  gem.email = "gerrit.riessen@gmail.com"
-  gem.authors = ["Gerrit Riessen"]
-
-  gem.add_development_dependency "shoulda", ">= 0"
-  gem.add_development_dependency "rake", ">= 0"
-  gem.add_development_dependency "jeweler", ">= 0"
-  gem.add_development_dependency "inifile", ">= 0"
-  gem.add_development_dependency "rdoc", ">= 0"
-  gem.add_development_dependency "rcov", ">= 0"
-  gem.add_development_dependency "rr", ">= 0"
-
-  gem.add_runtime_dependency "inifile", ">= 0"
-  # dependencies defined in Gemfile
+  gem.email       = "gerrit.riessen@gmail.com"
+  gem.authors     = ["Gerrit Riessen"]
 end
 Jeweler::RubygemsDotOrgTasks.new
 
@@ -51,7 +40,7 @@ end
 
 task :default => :test
 
-require 'rdoc/task'
+require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
 
